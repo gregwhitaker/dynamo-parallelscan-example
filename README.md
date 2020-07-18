@@ -1,6 +1,11 @@
 # dynamo-parallelscan-example
 An example of using parallel table scanning in DynamoDB.
 
+## Building the Example
+Run the following command to build the example application:
+
+    ./gradlew clean build
+
 ## License
 MIT License
 
