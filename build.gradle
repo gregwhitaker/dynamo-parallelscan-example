@@ -16,6 +16,7 @@ repositories {
 
 dependencies {
     implementation "com.amazonaws:aws-java-sdk-dynamodb:1.11.821"
+    implementation "org.apache.commons:commons-lang3:3.11"
     implementation "org.slf4j:slf4j-api:1.7.30"
     implementation "org.slf4j:slf4j-simple:1.7.30"
 }
