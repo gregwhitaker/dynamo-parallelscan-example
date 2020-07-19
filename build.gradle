@@ -1,13 +1,13 @@
 plugins {
     id "idea"
     id "java"
+    id "application"
     id "com.avast.gradle.docker-compose"    version "0.13.0"
-    id "org.unbroken-dome.test-sets"        version "3.0.1"
-    id "com.adarshr.test-logger"            version "2.1.0"
 }
 
-project.group   = "com.github.gregwhitaker"
-project.version = "0.1.0"
+project.group           = "com.github.gregwhitaker"
+project.version         = "0.1.0"
+project.mainClassName   = "example.Application"
 
 repositories {
     jcenter()
@@ -20,13 +20,7 @@ dependencies {
     implementation "org.slf4j:slf4j-simple:1.7.30"
 }
 
-// Testing
-testSets {
-    integTest
-}
-
 // Docker Compose
 dockerCompose {
     useComposeFiles = [ 'localstack/localstack-docker-compose.yml' ]
 }
-dockerCompose.isRequiredBy(integTest)
