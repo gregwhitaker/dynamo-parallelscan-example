@@ -38,7 +38,7 @@ public class Application {
 
     public void run() {
         final AmazonDynamoDB dynamoDBClient = AmazonDynamoDBClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:4566", "us-east-1"))
+                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:4569", "us-east-1"))
                 .build();
 
         final DynamoDB dynamoDB = new DynamoDB(dynamoDBClient);
@@ -46,6 +46,7 @@ public class Application {
 
         createTable(dynamoDB);
         populateTable(mapper);
+        scanTable();
     }
 
     private void createTable(DynamoDB dynamoDB) {
@@ -84,7 +85,13 @@ public class Application {
             product.setName(RandomStringUtils.randomAlphabetic(10));
             product.setPrices(Arrays.asList(msrpPrice, listPrice));
 
+            LOG.info("Saving product: {}", product.getId());
+
             mapper.save(product);
         }
+    }
+
+    private void scanTable() {
+
     }
 }

@@ -1,5 +1,6 @@
 package example.model;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 import java.util.List;
@@ -8,7 +9,9 @@ import java.util.List;
 public class Product {
     public static final String TABLE_NAME = "catalog.products";
 
+    @DynamoDBHashKey
     private String id;
+
     private String name;
     private String status;
     private List<ProductPrice> prices;
