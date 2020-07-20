@@ -5,7 +5,11 @@ import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.document.DynamoDB;
+import com.amazonaws.services.dynamodbv2.document.Item;
+import com.amazonaws.services.dynamodbv2.document.ItemCollection;
+import com.amazonaws.services.dynamodbv2.document.ScanOutcome;
 import com.amazonaws.services.dynamodbv2.document.Table;
+import com.amazonaws.services.dynamodbv2.document.spec.ScanSpec;
 import com.amazonaws.services.dynamodbv2.model.AttributeDefinition;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.KeySchemaElement;
@@ -20,8 +24,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.UUID;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadLocalRandom;
 
 /**
@@ -30,6 +37,7 @@ import java.util.concurrent.ThreadLocalRandom;
 public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
     private static final Long NUM_TABLE_ENTRIES = 1_000L;
+    private static final int NUM_SEGMENT_SCANNER_THREADS = 4;
 
     public static void main(String... args) {
         Application example = new Application();
@@ -44,9 +52,9 @@ public class Application {
         final DynamoDB dynamoDB = new DynamoDB(dynamoDBClient);
         final DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
 
-        createTable(dynamoDB);
-        populateTable(mapper);
-        scanTable();
+//        createTable(dynamoDB);
+//        populateTable(mapper);
+        scanTable(dynamoDB);
     }
 
     private void createTable(DynamoDB dynamoDB) {
@@ -91,7 +99,63 @@ public class Application {
         }
     }
 
-    private void scanTable() {
+    private void scanTable(DynamoDB dynamoDB) {
+        final ExecutorService executor = Executors.newFixedThreadPool(NUM_SEGMENT_SCANNER_THREADS);
 
+        int totalSegments = NUM_SEGMENT_SCANNER_THREADS;
+        for (int segment = 0; segment < totalSegments; segment++) {
+            ScanSegmentTask task = new ScanSegmentTask(dynamoDB, Product.TABLE_NAME, 100, totalSegments, segment);
+            executor.execute(task);
+        }
+    }
+
+    private static class ScanSegmentTask implements Runnable {
+
+        private final DynamoDB dynamoDB;
+        private final String tableName;
+        private final int limit;
+        private final int totalSegments;
+        private final int segment;
+
+        public ScanSegmentTask(DynamoDB dynamoDB, String tableName, int limit, int totalSegments, int segment) {
+            this.dynamoDB = dynamoDB;
+            this.tableName = tableName;
+            this.limit = limit;
+            this.totalSegments = totalSegments;
+            this.segment = segment;
+        }
+
+        @Override
+        public void run() {
+            System.out.println("Scanning " + tableName + " segment " + segment + " out of " + totalSegments
+                    + " segments " + limit + " items at a time...");
+            int totalScannedItemCount = 0;
+
+            Table table = dynamoDB.getTable(tableName);
+
+            try {
+                ScanSpec spec = new ScanSpec()
+                        .withTotalSegments(totalSegments)
+                        .withSegment(segment);
+
+                ItemCollection<ScanOutcome> items = table.scan(spec);
+                Iterator<Item> iterator = items.iterator();
+
+                Item currentItem = null;
+                while (iterator.hasNext()) {
+                    totalScannedItemCount++;
+                    currentItem = iterator.next();
+                    System.out.println(currentItem.toString());
+                }
+
+            }
+            catch (Exception e) {
+                System.err.println(e.getMessage());
+            }
+            finally {
+                System.out.println("Scanned " + totalScannedItemCount + " items from segment " + segment + " out of "
+                        + totalSegments + " of " + tableName);
+            }
+        }
     }
 }
