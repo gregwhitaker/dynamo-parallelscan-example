@@ -13,7 +13,7 @@ public class Product {
     private String id;
 
     private String name;
-    private String status;
+    private String productStatus;
     private List<ProductPrice> prices;
 
     public String getId() {
@@ -32,12 +32,12 @@ public class Product {
         this.name = name;
     }
 
-    public String getStatus() {
-        return status;
+    public String getProductStatus() {
+        return productStatus;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setProductStatus(String productStatus) {
+        this.productStatus = productStatus;
     }
 
     public List<ProductPrice> getPrices() {

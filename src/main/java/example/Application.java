@@ -52,8 +52,8 @@ public class Application {
         final DynamoDB dynamoDB = new DynamoDB(dynamoDBClient);
         final DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
 
-//        createTable(dynamoDB);
-//        populateTable(mapper);
+        createTable(dynamoDB);
+        populateTable(mapper);
         scanTable(dynamoDB);
     }
 
@@ -89,7 +89,13 @@ public class Application {
 
             final Product product = new Product();
             product.setId(UUID.randomUUID().toString());
-            product.setStatus("ACTIVE");
+
+            if (i % 2 == 1) {
+                product.setProductStatus("ACTIVE");
+            } else {
+                product.setProductStatus("INACTIVE");
+            }
+
             product.setName(RandomStringUtils.randomAlphabetic(10));
             product.setPrices(Arrays.asList(msrpPrice, listPrice));
 
@@ -135,6 +141,7 @@ public class Application {
 
             try {
                 ScanSpec spec = new ScanSpec()
+                        .withFilterExpression("productStatus = ACTIVE")
                         .withTotalSegments(totalSegments)
                         .withSegment(segment);
 
