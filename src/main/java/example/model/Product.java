@@ -13,7 +13,9 @@ public class Product {
     private String id;
 
     private String name;
+    private String description;
     private String productStatus;
+    private long createdAt;
     private List<ProductPrice> prices;
 
     public String getId() {
@@ -32,12 +34,28 @@ public class Product {
         this.name = name;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
     public String getProductStatus() {
         return productStatus;
     }
 
     public void setProductStatus(String productStatus) {
         this.productStatus = productStatus;
+    }
+
+    public long getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(long createdAt) {
+        this.createdAt = createdAt;
     }
 
     public List<ProductPrice> getPrices() {

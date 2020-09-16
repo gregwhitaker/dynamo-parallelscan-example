@@ -21,6 +21,10 @@ import example.model.ProductPrice;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.boot.CommandLineRunner;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -34,87 +38,44 @@ import java.util.concurrent.ThreadLocalRandom;
 /**
  * Runs the example application.
  */
+@SpringBootApplication
 public class Application {
     private static final Logger LOG = LoggerFactory.getLogger(Application.class);
-    private static final Long NUM_TABLE_ENTRIES = 1_000L;
     private static final int NUM_SEGMENT_SCANNER_THREADS = 4;
 
     public static void main(String... args) {
-        Application example = new Application();
-        example.run();
+        SpringApplication.run(Application.class, args);
     }
 
-    public void run() {
-        final AmazonDynamoDB dynamoDBClient = AmazonDynamoDBClientBuilder.standard()
-                .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:4569", "us-east-1"))
-                .build();
+    @Component
+    public class AppRunner implements CommandLineRunner {
 
-        final DynamoDB dynamoDB = new DynamoDB(dynamoDBClient);
-        final DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
+        @Override
+        public void run(String... args) throws Exception {
+            final AmazonDynamoDB dynamoDBClient = AmazonDynamoDBClientBuilder.standard()
+                    .withEndpointConfiguration(new AwsClientBuilder.EndpointConfiguration("http://localhost:4566", "us-east-1"))
+                    .build();
 
-        createTable(dynamoDB);
-        populateTable(mapper);
-        scanTable(dynamoDB);
-    }
+            final DynamoDB dynamoDB = new DynamoDB(dynamoDBClient);
+            final DynamoDBMapper mapper = new DynamoDBMapper(dynamoDBClient);
 
-    private void createTable(DynamoDB dynamoDB) {
-        LOG.info("Creating Table: {}", Product.TABLE_NAME);
+            scanTable(dynamoDB);
+        }
 
-        final List<KeySchemaElement> keySchema = new ArrayList<>();
-        keySchema.add(new KeySchemaElement("id", KeyType.HASH));
+        private void scanTable(DynamoDB dynamoDB) {
+            final ExecutorService executor = Executors.newFixedThreadPool(NUM_SEGMENT_SCANNER_THREADS);
 
-        final List<AttributeDefinition> attributeDefinitions = new ArrayList<>();
-        attributeDefinitions.add(new AttributeDefinition("id", ScalarAttributeType.S));
-
-        final CreateTableRequest createTableRequest = new CreateTableRequest();
-        createTableRequest.setTableName(Product.TABLE_NAME);
-        createTableRequest.setKeySchema(keySchema);
-        createTableRequest.setAttributeDefinitions(attributeDefinitions);
-        createTableRequest.setProvisionedThroughput(new ProvisionedThroughput(1000L, 1000L));
-
-        Table table = dynamoDB.createTable(createTableRequest);
-
-        LOG.info("Created Table: {}", Product.TABLE_NAME);
-    }
-
-    private void populateTable(DynamoDBMapper mapper) {
-        for (int i = 1; i <= NUM_TABLE_ENTRIES; i++) {
-            final ProductPrice msrpPrice = new ProductPrice();
-            msrpPrice.setType("msrp");
-            msrpPrice.setPrice(ThreadLocalRandom.current().nextDouble());
-
-            final ProductPrice listPrice = new ProductPrice();
-            listPrice.setType("list");
-            listPrice.setPrice(ThreadLocalRandom.current().nextDouble());
-
-            final Product product = new Product();
-            product.setId(UUID.randomUUID().toString());
-
-            if (i % 2 == 1) {
-                product.setProductStatus("ACTIVE");
-            } else {
-                product.setProductStatus("INACTIVE");
+            int totalSegments = NUM_SEGMENT_SCANNER_THREADS;
+            for (int segment = 0; segment < totalSegments; segment++) {
+                ScanSegmentTask task = new ScanSegmentTask(dynamoDB, Product.TABLE_NAME, 100, totalSegments, segment);
+                executor.execute(task);
             }
-
-            product.setName(RandomStringUtils.randomAlphabetic(10));
-            product.setPrices(Arrays.asList(msrpPrice, listPrice));
-
-            LOG.info("Saving product: {}", product.getId());
-
-            mapper.save(product);
         }
     }
 
-    private void scanTable(DynamoDB dynamoDB) {
-        final ExecutorService executor = Executors.newFixedThreadPool(NUM_SEGMENT_SCANNER_THREADS);
-
-        int totalSegments = NUM_SEGMENT_SCANNER_THREADS;
-        for (int segment = 0; segment < totalSegments; segment++) {
-            ScanSegmentTask task = new ScanSegmentTask(dynamoDB, Product.TABLE_NAME, 100, totalSegments, segment);
-            executor.execute(task);
-        }
-    }
-
+    /**
+     *
+     */
     private static class ScanSegmentTask implements Runnable {
 
         private final DynamoDB dynamoDB;
