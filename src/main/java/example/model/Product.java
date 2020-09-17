@@ -5,6 +5,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 
 import java.util.List;
 
+/**
+ * Product domain object.
+ */
 @DynamoDBTable(tableName = Product.TABLE_NAME)
 public class Product {
     public static final String TABLE_NAME = "catalog.products";

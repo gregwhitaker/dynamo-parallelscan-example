@@ -53,7 +53,11 @@ public class ProductTableInitializer {
                 product.setProductStatus("INACTIVE");
             }
 
-            mapper.save(product);
+            try {
+                mapper.save(product);
+            } catch (Throwable t) {
+                t.printStackTrace();
+            }
         }
     }
 
@@ -61,7 +65,7 @@ public class ProductTableInitializer {
      *
      */
     @DynamoDBTable(tableName = Product.TABLE_NAME)
-    static class Product {
+    public static class Product {
         public static final String TABLE_NAME = "catalog.products";
 
         @DynamoDBHashKey
@@ -126,7 +130,7 @@ public class ProductTableInitializer {
      *
      */
     @DynamoDBDocument
-    static class ProductPrice {
+    public static class ProductPrice {
 
         private String type;
         private double price;

@@ -2,6 +2,9 @@ package example.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 
+/**
+ * Product pricing domain object.
+ */
 @DynamoDBDocument
 public class ProductPrice {
 
