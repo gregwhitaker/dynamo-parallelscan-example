@@ -62,7 +62,7 @@ public class ProductTableInitializer {
     }
 
     /**
-     *
+     * Product domain object.
      */
     @DynamoDBTable(tableName = Product.TABLE_NAME)
     public static class Product {
@@ -127,7 +127,7 @@ public class ProductTableInitializer {
     }
 
     /**
-     *
+     * Product prices domain object.
      */
     @DynamoDBDocument
     public static class ProductPrice {
