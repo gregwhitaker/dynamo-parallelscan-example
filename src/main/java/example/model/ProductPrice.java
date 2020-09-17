@@ -2,6 +2,8 @@ package example.model;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 
+import java.math.BigDecimal;
+
 /**
  * Product pricing domain object.
  */
@@ -9,7 +11,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBDocument;
 public class ProductPrice {
 
     private String type;
-    private double price;
+    private BigDecimal price;
 
     public String getType() {
         return type;
@@ -19,11 +21,11 @@ public class ProductPrice {
         this.type = type;
     }
 
-    public double getPrice() {
+    public BigDecimal getPrice() {
         return price;
     }
 
-    public void setPrice(double price) {
+    public void setPrice(BigDecimal price) {
         this.price = price;
     }
 }

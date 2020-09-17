@@ -10,6 +10,11 @@ Run the following command to build the example application:
 Run the following command to start the application with a local DynamoDB instances provided by LocalStack:
 
     ./gradlew bootRunLocal
+    
+You can run the example multiple times without resetting the Dynamo table. Run the following command to teardown the LocalStack
+environment:
+
+    ./gradlew killLocalStack
 
 ## License
 MIT License

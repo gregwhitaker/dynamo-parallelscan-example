@@ -112,7 +112,9 @@ public class Application {
 
                 if (iterator.hasNext()) {
                     while (iterator.hasNext()) {
-                        final Item item = iterator.next();
+                        Product product = Product.from(iterator.next());
+
+                        System.out.printf("[segment %s] Found product %s\n", segment, product.getId());
                         recordCnt.increment();
                     }
                 } else {
