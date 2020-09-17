@@ -11,6 +11,29 @@ Run the following command to start the application with a local DynamoDB instanc
 
     ./gradlew bootRunLocal
     
+If successful, you should see something similar to the following in the terminal:
+
+    [segment 0] Found product 00527
+    [segment 2] Found product 00327
+    [segment 0] Found product 00063
+    [segment 2] Found product 00410
+    Processed 246 records on segment 0
+    [segment 2] Found product 00203
+    [segment 2] Found product 00902
+    [segment 2] Found product 00847
+    [segment 2] Found product 00603
+    [segment 2] Found product 00161
+    [segment 2] Found product 00091
+    [segment 2] Found product 00544
+    [segment 2] Found product 00492
+    [segment 2] Found product 00729
+    [segment 2] Found product 00719
+    [segment 2] Found product 00150
+    [segment 2] Found product 00429
+    [segment 2] Found product 00497
+    Processed 247 records on segment 2
+    Scan completed!
+    
 You can run the example multiple times without resetting the Dynamo table. Run the following command to teardown the LocalStack
 environment:
 
