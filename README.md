@@ -1,4 +1,6 @@
 # dynamo-parallelscan-example
+[![Build Status](https://travis-ci.org/gregwhitaker/dynamo-parallelscan-example.svg?branch=master)](https://travis-ci.org/gregwhitaker/dynamo-parallelscan-example)
+
 An example of using parallel table scanning in DynamoDB.
 
 ## Building the Example
