@@ -16,6 +16,9 @@ environment:
 
     ./gradlew killLocalStack
 
+## Bugs and Feedback
+For bugs, questions, and discussions please use the [Github Issues](https://github.com/gregwhitaker/dynamo-parallelscan-example/issues).
+
 ## License
 MIT License
 
