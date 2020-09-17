@@ -12,8 +12,8 @@ plugins {
     id "com.nike.pdm.localstack"            version "0.1.0"
 }
 
-project.group           = "com.github.gregwhitaker"
-project.version         = "0.1.0"
+project.group   = "com.github.gregwhitaker"
+project.version = "0.1.0"
 
 repositories {
     jcenter()
