@@ -5,11 +5,16 @@ An example of using parallel table scanning in DynamoDB.
 Run the following command to build the example application:
 
     ./gradlew clean build
+    
+## Running the Example
+Run the following command to start the application with a local DynamoDB instances provided by LocalStack:
+
+    ./gradlew bootRunLocal
 
 ## License
 MIT License
 
-Copyright (c) 2020 Greg Whitaker
+Copyright (c) 2020-Present Greg Whitaker
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
